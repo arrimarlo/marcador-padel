@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3a8a">
+    <title>Marcador Pádel</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk1hcmNhZG9yIFDDoWRlbCIsCiAgInNob3J0X25hbWUiOiAiUMOhZGVsIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxZTNhOGEiLAogICJ0aGVtZV9jb2xvciI6ICIjMWUzYThhIiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgd2lkdGg9JzE5MicgaGVpZ2h0PScxOTInJTNFJTNDcmVjdCB3aWR0aD0nMTkyJyBoZWlnaHQ9JzE5MicgZmlsbD0nJTIzMWUzYThhJy8lM0UlM0N0ZXh0IHg9JzUwJTI1JyB5PSc1MCUyNScgZm9udC1zaXplPSc5MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZHk9Jy4zZW0nIGZpbGw9J3doaXRlJyUzRVAlM0MvdGV4dCUzRSUzQy9zdmclM0UiLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9LAogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB3aWR0aD0nNTEyJyBoZWlnaHQ9JzUxMiclM0UlM0NyZWN0IHdpZHRoPSc1MTInIGhlaWdodD0nNTEyJyBmaWxsPSclMjMxZTNhOGEnLyUzRSUzQ3RleHQgeD0nNTAlMjUnIHk9JzUwJTI1JyBmb250LXNpemU9JzI0MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZHk9Jy4zZW0nIGZpbGw9J3doaXRlJyUzRVAlM0MvdGV4dCUzRSUzQy9zdmclM0UiLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3730a3 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-undo { background: #eab308; color: white; }
+        .btn-undo:disabled { background: #6b7280; }
+        .btn-reset { background: #ef4444; color: white; }
+        .btn-stats { background: #22c55e; color: white; }
+        .btn-config { background: #374151; color: white; }
+        
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .config-section {
+            border-top: 2px solid #e5e7eb;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .config-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .btn-configure {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn-configure.active {
+            background: #22c55e;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stats-card {
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .stats-card.team1 {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        }
+        .stats-card.team2 {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+        .stats-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        .stats-card.team1 h3 { color: #991b1b; }
+        .stats-card.team2 h3 { color: #1e40af; }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .stats-card.team1 .stat-value { color: #dc2626; }
+        .stats-card.team2 .stat-value { color: #2563eb; }
+        
+        .general-stats {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .general-stats h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+        .general-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .general-item {
+            text-align: center;
+        }
+        .general-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+        .general-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .scoreboard {
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .scoreboard:active { transform: scale(0.98); }
+        .scoreboard.team1 {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        .scoreboard.team2 {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+        .scoreboard-content {
+            text-align: center;
+        }
+        .team-name {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .scores {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+        .score-item {
+            text-align: center;
+        }
+        .score-label {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+        .scoreboard.team1 .score-label { color: #fecaca; }
+        .scoreboard.team2 .score-label { color: #bfdbfe; }
+        .score-display {
+            font-size: 4.5rem;
+            font-weight: bold;
+            color: white;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-family: 'Courier New', monospace;
+            min-width: 120px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        
+        .instructions {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+        
+        .hidden { display: none; }
+        
+        @media (max-width: 768px) {
+            .title { font-size: 1.8rem; }
+            .btn { padding: 12px; font-size: 1.2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .scores { flex-wrap: wrap; gap: 20px; }
+            .score-display { font-size: 3rem; min-width: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">MARCADOR PÁDEL</h1>
+            <div class="buttons">
+                <button class="btn btn-undo" id="btnUndo" disabled>↶</button>
+                <button class="btn btn-reset" id="btnReset">↻</button>
+                <button class="btn btn-stats" id="btnStats">📊</button>
+                <button class="btn btn-config" id="btnConfig">⚙️</button>
+            </div>
+        </div>
+
+        <div class="panel hidden" id="configPanel">
+            <h2>Configuración</h2>
+            <div class="input-group">
+                <label>Equipo 1</label>
+                <input type="text" id="team1Name" value="Equipo 1">
+            </div>
+            <div class="input-group">
+                <label>Equipo 2</label>
+                <input type="text" id="team2Name" value="Equipo 2">
+            </div>
+            <div class="config-section">
+                <h3 style="margin-bottom: 15px;">Control Remoto BT (Beauty R1)</h3>
+                <div class="config-row">
+                    <span>Botón para Equipo 1:</span>
+                    <button class="btn-configure" id="btnConfigTeam1">Configurar</button>
+                </div>
+                <div class="config-row">
+                    <span>Botón para Equipo 2:</span>
+                    <button class="btn-configure" id="btnConfigTeam2">Configurar</button>
+                </div>
+                <p style="margin-top: 15px; color: #6b7280; font-size: 0.9rem;">
+                    Haz clic en "Configurar" y luego presiona el botón del mando BT que quieras asignar.
+                </p>
+            </div>
+        </div>
+
+        <div class="panel hidden" id="statsPanel">
+            <h2>Estadísticas del Partido</h2>
+            <div class="stats-grid">
+                <div class="stats-card team1">
+                    <h3 id="statsTeam1Name">Equipo 1</h3>
+                    <div class="stat-row">
+                        <span>Puntos ganados:</span>
+                        <span class="stat-value" id="statsTeam1Points">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Games ganados:</span>
+                        <span class="stat-value" id="statsTeam1Games">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Sets ganados:</span>
+                        <span class="stat-value" id="statsTeam1Sets">0</span>
+                    </div>
+                    <div class="stat-row" style="border-top: 2px solid #fca5a5; padding-top: 10px; margin-top: 10px;">
+                        <span style="font-weight: 600;">% de puntos:</span>
+                        <span class="stat-value" id="statsTeam1Percent">0%</span>
+                    </div>
+                </div>
+                <div class="stats-card team2">
+                    <h3 id="statsTeam2Name">Equipo 2</h3>
+                    <div class="stat-row">
+                        <span>Puntos ganados:</span>
+                        <span class="stat-value" id="statsTeam2Points">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Games ganados:</span>
+                        <span class="stat-value" id="statsTeam2Games">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Sets ganados:</span>
+                        <span class="stat-value" id="statsTeam2Sets">0</span>
+                    </div>
+                    <div class="stat-row" style="border-top: 2px solid #93c5fd; padding-top: 10px; margin-top: 10px;">
+                        <span style="font-weight: 600;">% de puntos:</span>
+                        <span class="stat-value" id="statsTeam2Percent">0%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="general-stats">
+                <h3>Información General</h3>
+                <div class="general-grid">
+                    <div class="general-item">
+                        <div class="general-label">Total de rallies</div>
+                        <div class="general-value" id="statsTotalRallies">0</div>
+                    </div>
+                    <div class="general-item">
+                        <div class="general-label">Duración</div>
+                        <div class="general-value" id="statsDuration">0:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scoreboard team1" id="scoreTeam1">
+            <div class="scoreboard-content">
+                <div class="team-name" id="team1NameDisplay">Equipo 1</div>
+                <div class="scores">
+                    <div class="score-item">
+                        <div class="score-label">SETS</div>
+                        <div class="score-display" id="team1Sets">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">GAMES</div>
+                        <div class="score-display" id="team1Games">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">PUNTOS</div>
+                        <div class="score-display" id="team1Points">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scoreboard team2" id="scoreTeam2">
+            <div class="scoreboard-content">
+                <div class="team-name" id="team2NameDisplay">Equipo 2</div>
+                <div class="scores">
+                    <div class="score-item">
+                        <div class="score-label">SETS</div>
+                        <div class="score-display" id="team2Sets">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">GAMES</div>
+                        <div class="score-display" id="team2Games">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">PUNTOS</div>
+                        <div class="score-display" id="team2Points">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <p>Toca el marcador del equipo para añadir puntos • Usa el control remoto configurado • Botón deshacer para correcciones</p>
+        </div>
+    </div>
+
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => {
+                    self.skipWaiting();
+                });
+                self.addEventListener('activate', (e) => {
+                    self.clients.claim();
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl);
+        }
+
+        const state = {
+            team1: { sets: 0, games: 0, points: 0 },
+            team2: { sets: 0, games: 0, points: 0 },
+            history: [],
+            stats: {
+                team1: { pointsWon: 0, gamesWon: 0, setsWon: 0 },
+                team2: { pointsWon: 0, gamesWon: 0, setsWon: 0 },
+                startTime: Date.now(),
+                totalRallies: 0
+            },
+            keyBindings: { team1: null, team2: null },
+            isConfigMode: false,
+            configuringTeam: null
+        };
+
+        const pointsMap = { 0: '0', 1: '15', 2: '30', 3: '40' };
+
+        function updateDisplay() {
+            document.getElementById('team1Sets').textContent = state.team1.sets;
+            document.getElementById('team1Games').textContent = state.team1.games;
+            document.getElementById('team1Points').textContent = pointsMap[state.team1.points] || state.team1.points;
+            
+            document.getElementById('team2Sets').textContent = state.team2.sets;
+            document.getElementById('team2Games').textContent = state.team2.games;
+            document.getElementById('team2Points').textContent = pointsMap[state.team2.points] || state.team2.points;
+            
+            document.getElementById('btnUndo').disabled = state.history.length === 0;
+        }
+
+        function updateStats() {
+            const team1Name = document.getElementById('team1Name').value;
+            const team2Name = document.getElementById('team2Name').value;
+            
+            document.getElementById('statsTeam1Name').textContent = team1Name;
+            document.getElementById('statsTeam2Name').textContent = team2Name;
+            
+            document.getElementById('statsTeam1Points').textContent = state.stats.team1.pointsWon;
+            document.getElementById('statsTeam1Games').textContent = state.stats.team1.gamesWon;
+            document.getElementById('statsTeam1Sets').textContent = state.stats.team1.setsWon;
+            
+            document.getElementById('statsTeam2Points').textContent = state.stats.team2.pointsWon;
+            document.getElementById('statsTeam2Games').textContent = state.stats.team2.gamesWon;
+            document.getElementById('statsTeam2Sets').textContent = state.stats.team2.setsWon;
+            
+            const total = state.stats.team1.pointsWon + state.stats.team2.pointsWon;
+            const percent1 = total > 0 ? Math.round((state.stats.team1.pointsWon / total) * 100) : 0;
+            const percent2 = total > 0 ? Math.round((state.stats.team2.pointsWon / total) * 100) : 0;
+            
+            document.getElementById('statsTeam1Percent').textContent = percent1 + '%';
+            document.getElementById('statsTeam2Percent').textContent = percent2 + '%';
+            
+            document.getElementById('statsTotalRallies').textContent = state.stats.totalRallies;
+            
+            const duration = Math.floor((Date.now() - state.stats.startTime) / 1000);
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            document.getElementById('statsDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function addPoint(team) {
+            state.history.push({
+                team1: {...state.team1},
+                team2: {...state.team2}
+            });
+            
+            state.stats.totalRallies++;
+            state.stats[`team${team}`].pointsWon++;
+            
+            if (team === 1) {
+                if (state.team1.points === 3 && state.team2.points === 3) {
+                    state.team1.points = 'V';
+                } else if (state.team1.points === 'V') {
+                    state.team1.points = 0;
+                    state.team1.games++;
+                    state.team2.points = 0;
+                    state.stats.team1.gamesWon++;
+                    checkSet(state.team1.games, state.team2.games, 1);
+                } else if (state.team2.points === 'V') {
+                    state.team2.points = 3;
+                    state.team1.points = 3;
+                } else if (state.team1.points === 3) {
+                    state.team1.points = 0;
+                    state.team1.games++;
+                    state.team2.points = 0;
+                    state.stats.team1.gamesWon++;
+                    checkSet(state.team1.games, state.team2.games, 1);
+                } else {
+                    state.team1.points++;
+                }
+            } else {
+                if (state.team1.points === 3 && state.team2.points === 3) {
+                    state.team2.points = 'V';
+                } else if (state.team2.points === 'V') {
+                    state.team2.points = 0;
+                    state.team2.games++;
+                    state.team1.points = 0;
+                    state.stats.team2.gamesWon++;
+                    checkSet(state.team1.games, state.team2.games, 2);
+                } else if (state.team1.points === 'V') {
+                    state.team1.points = 3;
+                    state.team2.points = 3;
+                } else if (state.team2.points === 3) {
+                    state.team2.points = 0;
+                    state.team2.games++;
+                    state.team1.points = 0;
+                    state.stats.team2.gamesWon++;
+                    checkSet(state.team1.games, state.team2.games, 2);
+                } else {
+                    state.team2.points++;
+                }
+            }
+            
+            updateDisplay();
+        }
+
+        function checkSet(games1, games2, winner) {
+            if ((games1 >= 6 && games1 - games2 >= 2) || (games2 >= 6 && games2 - games1 >= 2) || games1 === 7 || games2 === 7) {
+                setTimeout(() => {
+                    if (winner === 1) {
+                        state.team1.sets++;
+                        state.stats.team1.setsWon++;
+                    } else {
+                        state.team2.sets++;
+                        state.stats.team2.setsWon++;
+                    }
+                    state.team1.games = 0;
+                    state.team2.games = 0;
+                    state.team1.points = 0;
+                    state.team2.points = 0;
+                    updateDisplay();
+                }, 100);
+            }
+        }
+
+        function undo() {
+            if (state.history.length > 0) {
+                const lastState = state.history.pop();
+                state.team1 = lastState.team1;
+                state.team2 = lastState.team2;
+                updateDisplay();
+            }
+        }
+
+        function reset() {
+            if (confirm('¿Reiniciar el partido?')) {
+                state.team1 = { sets: 0, games: 0, points: 0 };
+                state.team2 = { sets: 0, games: 0, points: 0 };
+                state.history = [];
+                state.stats = {
+                    team1: { pointsWon: 0, gamesWon: 0, setsWon: 0 },
+                    team2: { pointsWon: 0, gamesWon: 0, setsWon: 0 },
+                    startTime: Date.now(),
+                    totalRallies: 0
+                };
+                updateDisplay();
+                updateStats();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('scoreTeam1').addEventListener('click', () => addPoint(1));
+        document.getElementById('scoreTeam2').addEventListener('click', () => addPoint(2));
+        document.getElementById('btnUndo').addEventListener('click', undo);
+        document.getElementById('btnReset').addEventListener('click', reset);
+
+        document.getElementById('btnConfig').addEventListener('click', () => {
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden');
+            document.getElementById('statsPanel').classList.add('hidden');
+        });
+
+        document.getElementById('btnStats').addEventListener('click', () => {
+            const panel = document.getElementById('statsPanel');
+            panel.classList.toggle('hidden');
+            document.getElementById('configPanel').classList.add('hidden');
+            if (!panel.classList.contains('hidden')) {
+                updateStats();
+                setInterval(updateStats, 1000);
+            }
+        });
+
+        document.getElementById('team1Name').addEventListener('input', (e) => {
+            document.getElementById('team1NameDisplay').textContent = e.target.value;
+        });
+
+        document.getElementById('team2Name').addEventListener('input', (e) => {
+            document.getElementById('team2NameDisplay').textContent = e.target.value;
+        });
+
+        document.getElementById('btnConfigTeam1').addEventListener('click', () => {
+            state.isConfigMode = true;
+            state.configuringTeam = 'team1';
+            document.getElementById('btnConfigTeam1').classList.add('active');
+            document.getElementById('btnConfigTeam1').textContent = 'Presiona un botón...';
+        });
+
+        document.getElementById('btnConfigTeam2').addEventListener('click', () => {
+            state.isConfigMode = true;
+            state.configuringTeam = 'team2';
+            document.getElementById('btnConfigTeam2').classList.add('active');
+            document.getElementById('btnConfigTeam2').textContent = 'Presiona un botón...';
+        });
+
+        // Mapeo legible de teclas especiales y multimedia
+        const keyNames = {
+            'ArrowUp': '↑',
+            'ArrowDown': '↓',
+            'ArrowLeft': '←',
+            'ArrowRight': '→',
+            'Enter': '⏎',
+            'Escape': 'ESC',
+            ' ': 'Space',
+            'AudioVolumeUp': '🔊+',
+            'AudioVolumeDown': '🔉-',
+            'AudioVolumeMute': '🔇',
+            'MediaPlayPause': '⏯',
+            'MediaTrackNext': '⏭',
+            'MediaTrackPrevious': '⏮',
+            'MediaStop': '⏹'
+        };
+
+        function getKeyName(key) {
+            return keyNames[key] || key;
+        }
+
+        // Prevenir comportamiento por defecto de TODAS las teclas
+        window.addEventListener('keydown', (e) => {
+            // Siempre prevenir el comportamiento por defecto de teclas multimedia y navegación
+            if (e.key.startsWith('Audio') || e.key.startsWith('Media') || 
+                e.key.startsWith('Arrow') || e.key === 'Enter' || 
+                e.key === 'Escape' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }
+        }, { capture: true, passive: false });
+
+        // Capturar TODOS los eventos de teclado (incluidas teclas multimedia)
+        document.addEventListener('keydown', (e) => {
+            // console.log('Tecla detectada:', e.key, 'Code:', e.code);
+            
+            if (state.isConfigMode && state.configuringTeam) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                
+                // Guardar exactamente lo que viene en e.key
+                state.keyBindings[state.configuringTeam] = e.key;
+                const btn = document.getElementById(`btnConfig${state.configuringTeam === 'team1' ? 'Team1' : 'Team2'}`);
+                btn.classList.remove('active');
+                btn.textContent = getKeyName(e.key);
+                state.isConfigMode = false;
+                state.configuringTeam = null;
+                
+                console.log(`Botón configurado para ${state.configuringTeam}: ${e.key}`);
+                return false;
+            }
+
+            if (e.key === state.keyBindings.team1) {
+                e.preventDefault();
+                e.stopPropagation();
+                addPoint(1);
+                return false;
+            } else if (e.key === state.keyBindings.team2) {
+                e.preventDefault();
+                e.stopPropagation();
+                addPoint(2);
+                return false;
+            }
+        }, { capture: true, passive: false });
+
+        // También capturar keyup por si el mando usa ese evento
+        document.addEventListener('keyup', (e) => {
+            if (state.isConfigMode && state.configuringTeam) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
